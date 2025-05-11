@@ -5,12 +5,15 @@ import App from "./App.tsx";
 import { BrowserRouter } from "react-router";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "./theme.ts";
+import { AuthProvider } from "./contexts/AuthContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
   </StrictMode>

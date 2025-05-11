@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link as RouterLink, useLocation, useNavigate } from "react-router";
+import { Link as RouterLink, useNavigate } from "react-router";
 import {
   Box,
   Button,
@@ -17,12 +17,7 @@ import {
 import AuthCover from "../../assets/auth-cover.png";
 import Logo from "../../assets/logo.svg";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
-type LocationState = {
-  from?: {
-    pathname: string;
-  };
-};
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -31,10 +26,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const { logIn, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const from =
-    (location.state as LocationState)?.from?.pathname || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,13 +40,25 @@ export default function Login() {
 
     try {
       setLoading(true);
+      await logIn(email, password);
+      navigate("/", { replace: true });
     } catch (error) {
       console.error(error);
       setError("Failed to log in. Please check your credentials.");
     } finally {
       setLoading(false);
-      localStorage.setItem("isLoggedIn", "true");
-      navigate(from, { replace: true });
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      await signInWithGoogle();
+    } catch (error) {
+      console.error(error);
+      setError("Failed to sign in with Google. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -120,9 +125,10 @@ export default function Login() {
                 bgcolor: "rgba(0,0,0,0.04)",
               },
             }}
+            onClick={handleGoogleSignIn}
             disabled={loading}
           >
-            Continue with Email
+            Continue with Google
           </Button>
 
           <Divider sx={{ my: 3 }}>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink, useNavigate } from "react-router";
 import {
   Box,
   Button,
@@ -17,6 +17,7 @@ import {
 import AuthCover from "../../assets/auth-cover.png";
 import Logo from "../../assets/logo.svg";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
@@ -26,6 +27,9 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { signUp, signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,9 +47,23 @@ export default function SignUp() {
 
     try {
       setLoading(true);
+      await signUp(email, password, firstName, lastName);
+      navigate("/", { replace: true });
     } catch (error) {
       console.error(error);
       setError("Failed to create an account. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      await signInWithGoogle();
+    } catch (error) {
+      console.error(error);
+      setError("Failed to sign in with Google. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -114,9 +132,10 @@ export default function SignUp() {
                 bgcolor: "rgba(0,0,0,0.04)",
               },
             }}
+            onClick={handleGoogleSignIn}
             disabled={loading}
           >
-            Continue with Email
+            Continue with Google
           </Button>
 
           <Divider sx={{ my: 3 }}>

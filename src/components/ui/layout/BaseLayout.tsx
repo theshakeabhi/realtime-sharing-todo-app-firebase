@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 import { AppBar, Box, CssBaseline, Toolbar, Typography } from "@mui/material";
-import Logo from "../../assets/logo.svg";
+import Logo from "../../../assets/logo.svg";
 
 export default function BaseLayout() {
   return (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router";
 import {
   Box,
   Button,
@@ -18,12 +18,23 @@ import AuthCover from "../../assets/auth-cover.png";
 import Logo from "../../assets/logo.svg";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
+type LocationState = {
+  from?: {
+    pathname: string;
+  };
+};
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from =
+    (location.state as LocationState)?.from?.pathname || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,6 +52,8 @@ export default function Login() {
       setError("Failed to log in. Please check your credentials.");
     } finally {
       setLoading(false);
+      localStorage.setItem("isLoggedIn", "true");
+      navigate(from, { replace: true });
     }
   };
 
